@@ -62,28 +62,40 @@ Move point N characters forward (backward if N is negative)."
 					;https://www.emacswiki.org/emacs/ElispCookbook
 
 ;;;###autoload
-(defun eel-replace-java-comment-with-python-one (beg end)
-  "Replace Java comment delimiters with Python one between BEG and END."
+(defun eel-replace-java-comment-start-with-python-one ()
+  "Replace Java `comment-start' with Python one outside Python docstring in whole buffer."
+  (interactive)
+  (goto-char (point-min))
+  (while (not (eobp))
+    (while (progn
+	     (forward-char)
+	     (eel-skip-python-comment-forward)
+	     (not (looking-at-p "//"))))
+    (delete-char 2)
+    (insert "##")))
+
+;;;###autoload
+(defun eel-replace-java-docstring-with-python-one (beg end)
+  "Replace Java docstring delimiters with Python one between BEG and END.
+
+This function has been left unfinished."
   (interactive "r")
   (let (
-	(re-alist '("/\\*+\\(.*\\(.*\n\\)*?.*\\)\\*+/" . "\'\'\'\\1\'\'\'"))) ;match multiple lines.
-    (python-mode)
+	(re-alist '(
+		    ("/\\*+\\(.*?\\)\\*+/" . "\'\'\'\\1\'\'\'") ;match one line.
+		    ("/\\*+\\(.*\\(.*\n\\)*?.*\\)\\*+/" . "\'\'\'\\1\'\'\'")))) ;match multiple lines.
     (save-excursion
       (save-restriction
 	(narrow-to-region beg end)
+	(mapc
+	 (lambda (element)
+	   (goto-char (point-min))
+	   (while (re-search-forward (car element) nil t)
+	     (replace-match (cdr element) nil nil)))
+	 re-alist)
 	(goto-char (point-min))
-	(while (re-search-forward (car re-alist) nil t)
-	  (replace-match (cdr re-alist) nil nil)
-	  (goto-char (point-min))
-	  (while (re-search-forward "^\\([ \t]\\*\\)\\(.*\n\\)" nil t)
-	    (replace-match "\\2" nil nil)))
-	(goto-char (point-min))
-	(while
-	    (progn
-	      (forward-char)
-	      (not (eel-python-comment-or-string-p)))
-	  (while (looking-back "//")
-	    (replace-match "##")))))))
+	(while (re-search-forward "^\\([ \t]*\\)\\(\\*[^/]\\)\\(.*\n\\)?" nil t)
+	  (replace-match " \\3" nil nil))))))
 
 ;;;###autoload
 (defun eel-convert-from-java-to-python (beg end)
@@ -95,7 +107,7 @@ This function has been left unfinished."
   (save-excursion
     (save-restriction
       (narrow-to-region beg end)
-      (eel-replace-java-comment-with-python-one (point-min) (point-max)))))
+      (eel-replace-java-docstring-with-python-one (point-min) (point-max)))))
 
 (provide 'eel-kabayaki)
 ;;; eel-kabayaki.el ends here
