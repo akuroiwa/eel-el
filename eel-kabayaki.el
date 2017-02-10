@@ -83,7 +83,8 @@ This function has been left unfinished."
   (let (
 	(re-alist '(
 		    ("/\\*+\\(.*?\\)\\*+/" . "\'\'\'\\1\'\'\'") ;match one line.
-		    ("/\\*+\\(.*\\(.*\n\\)*?.*\\)\\*+/" . "\'\'\'\\1\'\'\'")))) ;match multiple lines.
+		    ("/\\*+\\(.*\\(.*\n\\)*?.*\\)\\*+/" . "\'\'\'\\1\'\'\'") ;match multiple lines.
+		    (" \\*[^/]" . " "))))
     (save-excursion
       (save-restriction
 	(narrow-to-region beg end)
@@ -91,11 +92,9 @@ This function has been left unfinished."
 	 (lambda (element)
 	   (goto-char (point-min))
 	   (while (re-search-forward (car element) nil t)
-	     (replace-match (cdr element) nil nil)))
-	 re-alist)
-	(goto-char (point-min))
-	(while (re-search-forward "^\\([ \t]*\\)\\(\\*[^/]\\)\\(.*\n\\)?" nil t)
-	  (replace-match " \\3" nil nil))))))
+	     (replace-match (cdr element) nil nil)
+	     (goto-char (point-min))))
+	 re-alist)))))
 
 ;;;###autoload
 (defun eel-convert-from-java-to-python (beg end)
