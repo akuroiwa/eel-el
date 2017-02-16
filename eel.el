@@ -195,8 +195,11 @@ based on `delete-blank-lines'."
 	      (newline 2)
 	      (delete-blank-lines))
 	  (delete-blank-lines)
-	  (delete-blank-lines)
-	  (whitespace-cleanup))))))
+	  (delete-blank-lines)))
+      (when (not arg)
+	(goto-char (point-min))
+	(when (and (bolp) (eolp))
+	  (delete-blank-lines))))))
 
 ;;;###autoload
 (defun eel-delete-html-tag (beg end)
