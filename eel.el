@@ -108,7 +108,8 @@ With ARG nil or 1, insert the most recent kill and join lines.
 With argument N, reinsert the Nth most recent kill and join lines.
 
 With argument ONE-SPACE, does not join lines and execute the command such as\
-`delete-horizontal-space' `just-one-space' and `delete-trailing-whitespace'.
+`delete-horizontal-space' `just-one-space' and `delete-trailing-whitespace' \
+including ideographic space.
 With argument STAY-INDENTED, stay indented.
 These two arguments are called from `eel-just-one-space'.
 
@@ -180,31 +181,22 @@ With prefix argument ARG, stay indented."
 (defun eel-delete-blank-lines (beg end &optional arg)
   "Delete blank lines in region between BEG and END.
 
-With prefix argument ARG, delete all surrounding blank lines, leaving just one
+With prefix argument ARG, delete all surrounding blank lines, leaving just one \
 based on `delete-blank-lines'."
   (interactive "r\nP")
-  (let (
-	(r-list '(
-		  "[\u3000 \t]+$"	;(delete-trailing-whitespace) including ideographic space.
-		  "[ \t]*\n[ \t]*$"
-		  ))
-	)
-    (save-excursion
-      (save-restriction
-	(narrow-to-region beg end)
-	(mapc
-	 (lambda (element)
-	   (goto-char (point-min))
-	   (while (re-search-forward element nil t)
-	     (delete-region (match-beginning 0) (match-end 0))
-	     (when arg
-	       (newline 2)
-	       (delete-blank-lines))))
-	 r-list)
-	(when (not arg)
-	  (goto-char (point-min))
-	  (when (and (bolp) (eolp))
-	    (delete-blank-lines)))))))
+  (save-excursion
+    (save-restriction
+      (narrow-to-region beg end)
+      (eel-just-one-space (point-min) (point-max) t)
+      (goto-char (point-min))
+      (while (re-search-forward "[ \t]*\n[ \t]*$" nil t)
+	(if arg
+	    (progn
+	      (newline 2)
+	      (delete-blank-lines))
+	  (delete-blank-lines)
+	  (delete-blank-lines)
+	  (whitespace-cleanup))))))
 
 ;;;###autoload
 (defun eel-delete-html-tag (beg end)
