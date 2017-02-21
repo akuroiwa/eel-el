@@ -327,5 +327,20 @@ See `copy-to-register' and `insert-register'."
        (insert delimiter))
      registers)))
 
+;;;###autoload
+(defun eel-comment-kill (start end)
+  "Kill the first comment on each line in region between START and END.
+
+Since `eel-delete-blank-lines' is executed, \
+`comment-dwim' or `comment-kill' would be more convenient depending on the situation."
+  (interactive "r")
+  (let ((arg (count-lines start end)))
+    (save-excursion
+      (save-restriction
+	(narrow-to-region start end)
+	(goto-char (point-min))
+	(comment-kill arg)
+	(eel-delete-blank-lines (point-min) (point-max))))))
+
 (provide 'eel)
 ;;; eel.el ends here

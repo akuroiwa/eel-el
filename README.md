@@ -16,14 +16,30 @@ If you are Emacs beginner, please read Emacs Tutorial from Help menu.
 * <kbd>C-h f eel-evaluate-recursive-acronym [RET]</kbd>
 * <kbd>M-x describe-function [RET] eel-join-lines [RET]</kbd>
 
+### eel.el
+
+* eel-evaluate-recursive-acronym
+* eel-join-lines
+* eel-just-one-space
+* eel-delete-blank-lines
+* eel-delete-html-tag
+* eel-toggle-double-quote
+* eel-add-number-grouping
+* eel-concatenate-insert-register
+* eel-comment-kill
+
 ### eel-kabayaki.el
 
-It doesn't work correctly since there are so many bugs.  Please execute them in order as follows \(but WITHOUT ANY WARRANTY\):
+It doesn't work correctly since there are so many bugs.  Please select a region manually and execute each function in order as follows \(but WITHOUT ANY WARRANTY\):
 
 1. <kbd>M-x python-mode
-2. <kbd>M-x mark-whole-buffer [RET]
-3. <kbd>M-x eel-replace-java-docstring-with-python-one [RET]
-4. <kbd>M-x eel-replace-java-comment-start-with-python-one [RET]
+2. <kbd>M-x eel-replace-java-docstring-with-python-one [RET]
+3. <kbd>M-x eel-replace-java-comment-start-with-python-one [RET]
+4. <kbd>M-x eel-replace-java-class-with-python-one [RET]
+
+If you like a challenge, please execute a command as below:
+
+* <kbd>M-x eel-convert-from-java-to-python [RET]
 
 ## Demo Video
 
