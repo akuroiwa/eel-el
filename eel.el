@@ -340,7 +340,8 @@ Since `eel-delete-blank-lines' is executed, \
 	(narrow-to-region start end)
 	(goto-char (point-min))
 	(comment-kill arg)
-	(eel-delete-blank-lines (point-min) (point-max))))))
+	(eel-delete-blank-lines (point-min) (point-max)))
+      (indent-region start end))))
 
 (provide 'eel)
 ;;; eel.el ends here
