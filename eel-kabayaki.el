@@ -64,9 +64,35 @@ Move point N characters forward (backward if N is negative)."
 					;https://www.emacswiki.org/emacs/ElispCookbook
 
 ;;;###autoload
+(defun eel-skip-docstring-forward (&optional limit)
+  "Skip Python docstring forward.
+With an optional argument, Restrict editing to LIMIT.
+
+This is based on the code `skip-string-forward' at:
+https://www.emacswiki.org/emacs/NavigatingParentheses"
+  (interactive)
+  (if (eq (char-after) ?\")
+      (catch 'done
+	(forward-char 1)
+	(while t
+	  (skip-chars-forward "^\\\\\"" limit)
+	  (cond ((eq (point) limit)
+		 (throw 'done nil))
+		((looking-at "\\(\"\"\"\\|'''\\)")
+		 (goto-char (match-end 0))
+		 (throw 'done nil))
+		(t
+		 (if (eq (point) limit)
+		     (throw 'done nil)
+		   (forward-char 1))))))))
+
+;;;###autoload
 (defun eel-replace-java-comment-start-with-python-one (beg end)
   "Replace Java `comment-start' with Python one outside Python docstring \
-in region between BEG and END or in whole buffer."
+in region between BEG and END or in whole buffer.
+
+This is based on the code `skip-string-forward' at:
+https://www.emacswiki.org/emacs/NavigatingParentheses"
   (interactive (if (use-region-p)
 		   (list (region-beginning) (region-end))
 		 (list (point-min) (point-max))))
@@ -75,13 +101,22 @@ in region between BEG and END or in whole buffer."
       (narrow-to-region beg end)
       (goto-char (point-min))
       (while (not (eobp))
-	(while (progn
-		 (forward-char)
-		 (eel-skip-python-comment-forward)
-		 (not (looking-at-p "//")))) ;Stop at `comment-start' of Java.
-	(delete-char 2)
-	(insert "##")
-	(eel-py--escape-doublequotes (point) (point-at-eol))))))
+	(catch 'break
+	  (while t
+	    (cond
+	     ((looking-at-p "\\(\"\"\"\\|'''\\)") ;Python docstring.
+	      (eel-skip-docstring-forward)
+	      (throw 'break nil)
+	      )
+	     ((looking-at "//") ;`comment-start' of Java.
+	      (replace-match "##")
+	      (end-of-line)
+	      (throw 'break nil))
+	     (t
+	      (if (eq (point) (point-max))
+		  (throw 'break nil)
+		(forward-char)
+		(skip-chars-forward " \t\n"))))))))))
 
 (defun eel-py--escape-doublequotes (start end)
   "Escape quote character including single quote or apostrophe \
@@ -106,11 +141,7 @@ This is based on the code `py--escape-doublequotes'."
 ;;;###autoload
 (defun eel-replace-java-docstring-with-python-one (beg end)
   "Replace Java docstring delimiters with Python one between BEG and END \
-or in whole buffer.
-
-Quote character in docstring will be escaped.
-
-This function has been left unfinished."
+or in whole buffer."
   (interactive (if (use-region-p)
 		   (list (region-beginning) (region-end))
 		 (list (point-min) (point-max))))
@@ -124,9 +155,9 @@ This function has been left unfinished."
 	(narrow-to-region beg end)
 	(mapc
 	 (lambda (element)
-	   (goto-char (point-min))
-	   (while (re-search-forward (car element) nil t)
-	     (eel-py--escape-doublequotes (match-beginning 0) (match-end 0)))
+	   ;; (goto-char (point-min))
+	   ;; (while (re-search-forward (car element) nil t)
+	   ;;   (eel-py--escape-doublequotes (match-beginning 0) (match-end 0)))
 	   (goto-char (point-min))
 	   (while (re-search-forward (car element) nil t)
 	     (replace-match (cdr element) nil nil)

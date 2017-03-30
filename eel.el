@@ -26,26 +26,32 @@
 
 ;; My personal functions.
 
-;; (setq eel-list '("Eel\'s" "emacs" "lisp"))
-;; (eel-evaluate-recursive-acronym eel-list)
+;; eel.el
 
-;; (eel-join-lines)
-;; Join lines region or `yank' and join lines.
+;; eel-evaluate-recursive-acronym
+;; eel-join-lines
+;; eel-just-one-space
+;; eel-delete-blank-lines
+;; eel-delete-html-tag
+;; eel-toggle-double-quote
+;; eel-add-number-grouping
+;; eel-concatenate-insert-register
+;; eel-comment-kill
 
-;; (eel-just-one-space)
-;; `just-one-space' in the region between BEG and END.
-;; With prefix argument ARG, stay indented.
+;; eel-kabayaki.el
 
-;; (eel-convert-from-java-to-python)
-;; Convert code from Java to Python in the region between BEG and END.
-;; This function has been left unfinished
-;; and is available in `eel-kabayaki.el'.
+;; Convert from java to python.
 
-;; (eel-delete-blank-lines)
-;; Delete blank lines in region between BEG and END.
+;; It doesn't work correctly since there are so many bugs.  Please select a region manually and execute each function in order as follows \(but WITHOUT ANY WARRANTY\):
 
-;; (eel-toggle-double-quote)
-;; Create double-quoted string or remove double quotes in region or sexp.
+;; 1. <kbd>M-x python-mode
+;; 2. <kbd>M-x eel-replace-java-docstring-with-python-one [RET]
+;; 3. <kbd>M-x eel-replace-java-comment-start-with-python-one [RET]
+;; 4. <kbd>M-x eel-replace-java-class-with-python-one [RET]
+
+;; If you like a challenge, please execute a command as below:
+
+;; <kbd>M-x eel-convert-from-java-to-python [RET]
 
 ;;; Code:
 
