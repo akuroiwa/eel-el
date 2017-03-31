@@ -114,7 +114,7 @@ https://www.emacswiki.org/emacs/NavigatingParentheses"
 	      (throw 'break nil))
 	     (t
 	      (if (eq (point) (point-max))
-		  (throw 'break nil)
+		  (throw 'break t)
 		(forward-char)
 		(skip-chars-forward " \t\n"))))))))))
 
@@ -175,9 +175,9 @@ or in region between BEG and END."
 		 (list (point-min) (point-max))))
   (let (
 	(re-alist '(
-		    ("\\(public\\|private\\|protected\\) " . "")
-		    ("class\\(.*?\\)\\(extends\\) \\(.*?\\) *\{" . "class\\1\(\\3\):\{")
-		    ("class\\(.*?\\) *\{" . "class\\1:\{"))))
+	 	    ("\\(public\\|private\\|protected\\) class\\(.*?\\)\\(extends\\) \\(.*?\\) *\{" . "class\\2\(\\4\):\{")
+	 	    ("\\(public\\|private\\|protected\\) class\\(.*?\\) *\{" . "class\\2:\{")))
+	)
     (save-excursion
       (save-restriction
 	(narrow-to-region beg end)
@@ -185,15 +185,26 @@ or in region between BEG and END."
 	 (lambda (element)
 	   (goto-char (point-min))
 	   (while (not (eobp))
-	     (while (progn
-		      (forward-line)
-		      (eel-skip-python-comment-forward)
-		      (looking-at (car element)))
-	       (replace-match (cdr element))
-	       (goto-char (match-end 0))
-	       (backward-char)
-	       (when (char-equal ?\{ (char-after))
-		 (delete-pair)))))
+	     (catch 'break
+	       (while t
+		 (cond
+		  ((looking-at-p "\\(\"\"\"\\|'''\\)") ;Python docstring.
+		   (eel-skip-docstring-forward)
+		   (throw 'break nil))
+		  ((looking-at-p "#")
+		   (eel-skip-python-comment-forward))
+		  ((looking-at (car element))
+		   (replace-match (cdr element))
+		   (goto-char (match-end 0))
+		   (backward-char)
+		   (when (char-equal ?\{ (char-after))
+		     (delete-pair))
+		   (throw 'break nil))
+		  (t
+		   (if (eq (point) (point-max))
+		       (throw 'break t)
+		     (forward-char)
+		     (skip-chars-forward " \t\n"))))))))
 	 re-alist)))))
 
 ;;;###autoload

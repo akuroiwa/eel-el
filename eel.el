@@ -62,7 +62,7 @@
 (defun eel-evaluate-recursive-acronym (acronym-list &optional arg)
   "Using dolist, evaluate the recursive acronym of ACRONYM-LIST.
 
-With prefix argument ARG, insert the abbreviation at `region-end'
+With a prefix argument ARG, insert the abbreviation at `region-end'
 or at point.
 
 Non-interactively:
@@ -176,7 +176,7 @@ and based on the code of `xah-replace-regexp-pairs-region' in `xah-replace-pairs
 (defun eel-just-one-space (beg end &optional arg)
   "`just-one-space' in the region between BEG and END.
 
-With prefix argument ARG, stay indented."
+With a prefix argument ARG, stay indented."
   (interactive "r\nP")
   (save-excursion
     (if arg
@@ -187,8 +187,8 @@ With prefix argument ARG, stay indented."
 (defun eel-delete-blank-lines (beg end &optional arg)
   "Delete blank lines in region between BEG and END.
 
-With prefix argument ARG, delete all surrounding blank lines, leaving just one \
-based on `delete-blank-lines'."
+With a prefix argument ARG, delete all surrounding blank lines, leaving \
+just one based on `delete-blank-lines'."
   (interactive "r\nP")
   (save-excursion
     (save-restriction
@@ -314,23 +314,29 @@ https://www.emacswiki.org/emacs/AddCommasToNumbers"
     num))				;Return value unless called interactively.
 
 ;;;###autoload
-(defun eel-concatenate-insert-register (registers &optional delimiter)
+(defun eel-concatenate-insert-register (registers &optional delimiter arg)
   "Insert and concatenate contents of register REGISTERS.
 \(REGISTERS is characters without white-space delimiter.\)
 
 Default DELIMITER of each content is nil.
-See `copy-to-register' and `insert-register'."
+See `copy-to-register' and `insert-register'.
+
+With a prefix argument ARG, insert delimiter at the head of a string."
   (interactive
    (let (
 	 (registers (string-to-list (read-string "Registers without white-space delimiter: ")))
 	 (delimiter (read-string "Delimiter of each content: " nil nil nil))
 	 )
-     (list registers delimiter)))
+     (list registers delimiter current-prefix-arg)))
   (save-excursion
     (mapc
      (lambda (element)
-       (insert-register element t)
-       (insert delimiter))
+       (if arg
+	   (progn
+	     (insert delimiter)
+	     (insert-register element t))
+	 (insert-register element t)
+	 (insert delimiter)))
      registers)))
 
 ;;;###autoload
