@@ -71,11 +71,13 @@ With an optional argument, Restrict editing to LIMIT.
 This is based on the code `skip-string-forward' at:
 https://www.emacswiki.org/emacs/NavigatingParentheses"
   (interactive)
-  (if (eq (char-after) ?\")
+  (if (or
+       (eq (char-after) ?')
+       (eq (char-after) ?\"))
       (catch 'done
 	(forward-char 1)
 	(while t
-	  (skip-chars-forward "^\\\\\"" limit)
+	  (skip-syntax-forward "^'\"" limit)
 	  (cond ((eq (point) limit)
 		 (throw 'done nil))
 		((looking-at "\\(\"\"\"\\|'''\\)")
