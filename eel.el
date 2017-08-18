@@ -353,7 +353,18 @@ Since `eel-delete-blank-lines' is executed, \
 	(goto-char (point-min))
 	(comment-kill arg)
 	(eel-delete-blank-lines (point-min) (point-max)))
-      (indent-region start end))))
+      ;; (indent-region start end)
+      )))
+
+;;;###autoload
+(defun eel-current-kill-to-register (register)
+  "Copy `current-kill' into register REGISTER."
+  (interactive (list (register-read-with-preview "Copy current-kill to register: ")))
+  (switch-to-buffer (get-buffer-create "*eel-current-kill*"))
+  ;; (erase-buffer)
+  (yank)
+  (copy-to-register register (point-min) (point-max))
+  (kill-buffer))
 
 (provide 'eel)
 ;;; eel.el ends here
